@@ -575,6 +575,11 @@
     background:linear-gradient(180deg, rgba(20,4,4,0.62) 0%, rgba(20,4,4,0.7) 55%, rgba(20,4,4,0.78) 100%);
     z-index:0;
   }
+  .page-banner.shop-banner::before,
+  .page-banner.contact-banner::before,
+  .page-banner.about-banner::before {
+    content:none;
+  }
   .page-banner > * {
     position:relative;
     z-index:1;
