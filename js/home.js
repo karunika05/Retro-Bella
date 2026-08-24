@@ -27,10 +27,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---------- Spotlight Swatches & Sizes ----------
+  const colorLabel = document.getElementById('colorLabel');
   document.querySelectorAll('#colorSwatches .sw').forEach(sw => {
     sw.addEventListener('click', () => {
       document.querySelectorAll('#colorSwatches .sw').forEach(s => s.classList.remove('active'));
       sw.classList.add('active');
+      if (colorLabel) colorLabel.textContent = sw.dataset.color;
     });
   });
 
