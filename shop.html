@@ -8,7 +8,98 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;1,6..96,400;1,6..96,500&family=Archivo+Expanded:wght@500;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
+<style>
+  .page-banner{
+    position:relative;
+    isolation:isolate;
+    overflow:hidden;
+    background-color:#3a0808;
+    background-image:url('Images/bg.jpeg');
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    padding:150px 5vw 130px;
+  }
+  .page-banner::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(180deg, rgba(20,4,4,0.62) 0%, rgba(20,4,4,0.7) 55%, rgba(20,4,4,0.78) 100%);
+    z-index:0;
+  }
+  .page-banner > *{
+    position:relative;
+    z-index:1;
+  }
+  .page-banner .breadcrumb,
+  .page-banner .breadcrumb a,
+  .page-banner .label,
+  .page-banner h1,
+  .page-banner .sub{
+    color:#ffffff !important;
+    text-shadow:0 2px 10px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.7);
+  }
+  .page-banner .breadcrumb a{
+    opacity:0.9;
+  }
+  .page-banner h1{
+    font-weight:600;
+  }
+  /* Product photos that already include their own white background/margin —
+     show the full image instead of cropping it to fill the frame. */
+  .product-media img.fit-contain{
+    object-fit:contain;
+    background:#ffffff;
+    padding:12px;
+  }
+  .icon-btn .icon-svg{
+    width:19px;
+    height:19px;
+  }
 
+  /* ---------- Filter bar: same theme, just pill-shaped + centered ---------- */
+  .filter-bar{
+    display:flex !important;
+    flex-wrap:wrap;
+    justify-content:center !important;
+    align-items:center;
+    gap:14px;
+  }
+  .filter-bar .filter-pill{
+    border-radius:999px !important;
+  }
+
+  /* ---------- Add to Cart + wishlist heart row (women.html style) ---------- */
+  .product-card{
+    display:flex;
+    flex-direction:column;
+  }
+  .card-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:14px 16px 16px;
+    margin-top:auto;
+  }
+  .add-cart-btn{
+    flex:1;
+    padding:12px 14px;
+    background:#2c1010;
+    color:#ffffff;
+    border:none;
+    border-radius:2px;
+    font-family:'Archivo Expanded', 'Inter', sans-serif;
+    font-size:11px;
+    font-weight:500;
+    letter-spacing:1.2px;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:background .25s ease;
+  }
+  .add-cart-btn:hover{
+    background:var(--sangria, #4D0909);
+  }
+</style>
 </head>
 <body>
 
