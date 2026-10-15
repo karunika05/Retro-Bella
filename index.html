@@ -14,11 +14,11 @@
 <div class="grain"></div>
 <div class="cursor-dot" id="cursorDot"></div>
 
-<!-- LOADER shown briefly every time the home page loads -->
-<div class="loader-overlay" id="welcomeLoader">
+<!-- LOADER shown briefly every time the home page loads (pure CSS animation, no JS) -->
+<div class="loader-overlay">
   <div class="loader-logo">RETRO <em>BELLA</em></div>
-  <div class="loader-bar-track"><div class="loader-bar-fill" id="welcomeFill"></div></div>
-  <span class="loader-caption" id="welcomeCaption">Preparing your home page…</span>
+  <div class="loader-bar-track"><div class="loader-bar-fill"></div></div>
+  <span class="loader-caption">Preparing your home page…</span>
 </div>
 
 <header id="siteHeader" class="on-video">
@@ -75,6 +75,60 @@
     <span>Complimentary Shipping</span><span>Made to Last</span>
   </div>
 </div>
+
+<!-- ===== Shop the Look (new) ===== -->
+<section id="shop-the-look" class="stl" aria-labelledby="stl-heading">
+  <div class="section-head reveal">
+    <div>
+      <span class="label">Styled Edits</span>
+      <h2 id="stl-heading">Shop the Look</h2>
+      <p class="stl-sub">Five ways to wear the season, styled from head to toe.</p>
+    </div>
+  </div>
+
+  <div class="stl-collage">
+    <a class="stl-card stl-card--luxury" href="shop.html?category=quiet-luxury" aria-label="Shop Quiet Luxury looks">
+      <div class="stl-media">
+        <img src="Images/luxury.png" width="692" height="839" loading="lazy"
+             alt="Model in a black polka-dot dress and sunglasses on a wooden boat, Quiet Luxury look">
+      </div>
+      <span class="stl-pill">Quiet Luxury <span class="stl-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
+    </a>
+
+    <a class="stl-card stl-card--party" href="shop.html?category=party-wear" aria-label="Shop Party Girl looks">
+      <div class="stl-media">
+        <img src="Images/party.png" width="666" height="910" loading="lazy"
+             alt="Model in a purple sequin strapless mini dress, Party Girl look">
+      </div>
+      <span class="stl-pill">Party Girl <span class="stl-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
+    </a>
+
+    <a class="stl-card stl-card--street" href="shop.html?category=street-style" aria-label="Shop Street Style looks">
+      <div class="stl-media">
+        <img src="Images/street.png" width="800" height="800" loading="lazy"
+             alt="Model wearing a relaxed knit shirt and casual tee, Street Style look">
+      </div>
+      <span class="stl-pill">Street Style <span class="stl-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
+    </a>
+
+    <a class="stl-card stl-card--retro" href="shop.html?category=retro-glam" aria-label="Shop Retro Glam looks">
+      <div class="stl-media">
+        <img src="Images/retro.png" width="516" height="914" loading="lazy"
+             alt="Model in a shearling-trim coat and sunglasses on a Paris street, Retro Glam look">
+      </div>
+      <span class="stl-pill">Retro Glam <span class="stl-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
+    </a>
+
+    <a class="stl-card stl-card--everyday" href="shop.html?category=everyday-chic" aria-label="Shop Everyday Chic looks">
+      <div class="stl-media">
+        <img src="Images/everyday.png" width="610" height="918" loading="lazy"
+             alt="Model in a navy sweater, white shirt and wide-leg jeans holding a coffee, Everyday Chic look">
+      </div>
+      <span class="stl-pill">Everyday Chic <span class="stl-arrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
+    </a>
+  </div>
+</section>
+<!-- ===== /Shop the Look ===== -->
 
 <section id="shop" class="shop-section">
   <div class="section-head reveal">
@@ -313,33 +367,9 @@
 </footer>
 
 <script>
-  // ---------- welcome loader (plays on every visit to the home page) ----------
-  (function(){
-    const overlay = document.getElementById('welcomeLoader');
-    const fill = document.getElementById('welcomeFill');
-    const caption = document.getElementById('welcomeCaption');
-    const params = new URLSearchParams(window.location.search);
-
-    if(params.get('welcome') === '1'){
-      caption.textContent = 'Welcome back — preparing your home page…';
-      // clean the URL so refreshing doesn't keep the welcome caption
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-
-    document.documentElement.style.overflow = 'hidden';
-    overlay.style.display = 'flex';
-    fill.style.width = '0%';
-
-    // small delay so the browser paints the 0% state before we animate to 100%
-    setTimeout(() => { fill.style.width = '100%'; }, 50);
-
-    // hide only once the 1.5s bar-fill transition has actually finished
-    setTimeout(() => {
-      overlay.classList.add('hide');
-      document.documentElement.style.overflow = '';
-      setTimeout(() => overlay.remove(), 650);
-    }, 1700);
-  })();
+  // ---------- loader is now pure CSS/HTML (see .loader-overlay in styles.css) ----------
+  // no JavaScript needed: the bar-fill and fade-out both run on @keyframes
+  // animations that start automatically when the page loads.
 
   const header = document.getElementById('siteHeader');
   window.addEventListener('scroll', () => {

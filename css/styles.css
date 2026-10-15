@@ -873,16 +873,39 @@
     position:fixed; inset:0; z-index:9999;
     background:var(--paper);
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px;
-    transition:opacity 0.6s ease, visibility 0.6s ease;
+    animation: loaderFadeOut 0.6s ease forwards;
+    animation-delay: 1.7s;
   }
-  .loader-overlay.hide{ opacity:0; visibility:hidden; pointer-events:none; }
+  @keyframes loaderFadeOut{
+    from{ opacity:1; visibility:visible; }
+    to{ opacity:0; visibility:hidden; pointer-events:none; }
+  }
   .loader-logo{ font-family:'Bodoni Moda', serif; font-size:1.5rem; letter-spacing:0.02em; color:var(--ink); }
   .loader-logo em{ font-style:italic; color:var(--sangria); }
   .loader-bar-track{ width:220px; height:2px; background:var(--line); position:relative; overflow:hidden; }
-  .loader-bar-fill{ position:absolute; left:0; top:0; bottom:0; width:0%; background:var(--sangria); transition:width 1.5s cubic-bezier(.22,.85,.24,1); }
+  .loader-bar-fill{
+    position:absolute; left:0; top:0; bottom:0; width:0%; background:var(--sangria);
+    animation: loaderFill 1.5s cubic-bezier(.22,.85,.24,1) forwards;
+    animation-delay: 0.05s;
+  }
+  @keyframes loaderFill{
+    from{ width:0%; }
+    to{ width:100%; }
+  }
   .loader-caption{
     font-family:'Archivo Expanded', sans-serif; font-size:0.64rem; letter-spacing:0.2em;
     text-transform:uppercase; color:rgba(92,22,38,0.5);
+  }
+
+  /* Lock page scroll while the loader is visible, then release it once the
+     fade-out animation above has finished (1.7s delay + 0.6s fade = 2.3s) */
+  html:has(.loader-overlay){
+    animation: loaderUnlockScroll 0.01s linear forwards;
+    animation-delay: 2.3s;
+    overflow:hidden;
+  }
+  @keyframes loaderUnlockScroll{
+    to{ overflow:visible; }
   }
 
   /* =========================================================
@@ -1047,3 +1070,103 @@
     gap: 10px !important;
     margin: 0 auto !important;
   }
+
+/* =========================================================
+   SHOP THE LOOK (.stl-*) — the fanned spread
+   Looks fan out like a hand of cards; hover/focus lifts one
+   forward and straightens it. Uses the site's own tokens.
+   Black/white only on the pills.
+   Mobile / tablet: a plain swipeable row.
+   ========================================================= */
+.stl-sub{ margin-top:16px; max-width:34rem; font-weight:300; line-height:1.6; opacity:0.8; }
+
+.stl-collage{
+  display:flex; align-items:flex-start; gap:14px;
+  max-width:1320px; margin:0 auto; padding:8px 8px 24px;
+  overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:thin;
+}
+.stl-card{ position:relative; display:block; flex:0 0 64%; min-width:0; scroll-snap-align:center; }
+.stl-card:focus-visible{ outline:2px solid var(--sangria); outline-offset:4px; border-radius:20px; }
+
+/* cut-paper edge + soft cherry-tinted shadow separate overlapping cards */
+.stl-media{
+  position:relative; overflow:hidden; aspect-ratio:3 / 4;
+  border-radius:18px; border:4px solid var(--paper);
+  background:var(--blush);
+  box-shadow:0 14px 30px rgba(77,9,9,0.18);
+}
+.stl-card:nth-child(even) .stl-media{ background:var(--blush-dim); }
+.stl-media img{
+  position:absolute; inset:0; display:block; width:100%; height:100%;
+  object-fit:cover; object-position:top center;
+  font-size:0;                      /* hides alt text while an image file is missing */
+  transition:transform 0.6s ease;
+}
+
+/* black pill + circular arrow, bottom-left so overlaps never hide it */
+.stl-pill{
+  position:absolute; left:14px; bottom:14px; max-width:calc(100% - 28px);
+  display:inline-flex; align-items:center; gap:8px; white-space:nowrap;
+  padding:5px 5px 5px 13px; border-radius:999px;
+  background:#000; color:#fff;
+  font-family:'Archivo Expanded', sans-serif; font-size:0.6rem;
+  letter-spacing:0.1em; text-transform:uppercase; line-height:1.2;
+}
+.stl-arrow{
+  display:grid; place-items:center; flex:none;
+  width:26px; height:26px; border-radius:50%;
+  background:#fff; color:#000; transition:transform 0.3s ease;
+}
+.stl-arrow svg{ width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+.stl-card:focus-visible .stl-media img{ transform:scale(1.05); }
+.stl-card:focus-visible .stl-arrow{ transform:translateX(4px); }
+@media (hover:hover){
+  .stl-card:hover .stl-media img{ transform:scale(1.05); }
+  .stl-card:hover .stl-arrow{ transform:translateX(4px); }
+}
+
+/* tablet: swipeable row, three looks in view */
+@media (min-width:641px){
+  .stl-card{ flex-basis:36%; }
+  .stl-pill{ font-size:0.64rem; }
+}
+
+/* desktop: the fan */
+@media (min-width:1101px){
+  .stl-collage{ overflow:visible; scroll-snap-type:none; gap:0; justify-content:center; padding:48px 16px 64px; }
+  .stl-card{
+    flex:0 0 22%; scroll-snap-align:none;
+    transform-origin:50% 100%;
+    transform:translateY(var(--stl-y)) rotate(var(--stl-r));
+    transition:transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .stl-card + .stl-card{ margin-left:-4%; }
+  .stl-card:nth-child(1){ --stl-r:-9deg; --stl-y:46px; z-index:1; }
+  .stl-card:nth-child(2){ --stl-r:-5deg;  --stl-y:14px; z-index:2; }
+  .stl-card:nth-child(3){ --stl-r:0deg;   --stl-y:0px;  z-index:3; }
+  .stl-card:nth-child(4){ --stl-r:5deg;   --stl-y:14px; z-index:2; }
+  .stl-card:nth-child(5){ --stl-r:9deg;  --stl-y:46px; z-index:1; }
+  .stl-card:focus-visible{ transform:translateY(-26px) rotate(0deg) scale(1.05); z-index:10; }
+  /* right-hand cards are overlapped on their left, so their pill sits bottom-right */
+  .stl-card:nth-child(n+4) .stl-pill{ left:auto; right:14px; }
+}
+@media (min-width:1101px) and (hover:hover){
+  .stl-card:hover{ transform:translateY(-26px) rotate(0deg) scale(1.05); z-index:10; }
+}
+
+/* shop page: "Showing: <look>" bar (added by shop.js) */
+.stl-showing{
+  display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:18px;
+  padding:0 20px 28px; color:var(--sangria);
+  font-family:'Archivo Expanded', sans-serif; font-size:0.7rem;
+  letter-spacing:0.1em; text-transform:uppercase;
+}
+.stl-showing strong{ font-weight:700; }
+.stl-showing-clear{
+  font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit;
+  background:none; border:0; border-bottom:1px solid var(--line);
+  padding:12px 0 4px; cursor:pointer;
+}
+.stl-showing-clear:hover{ border-bottom-color:var(--sangria); }
+.stl-showing-clear:focus-visible{ outline:2px solid var(--sangria); outline-offset:4px; }
