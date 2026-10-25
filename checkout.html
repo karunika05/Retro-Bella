@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Placed — RETRO&nbsp;BELLA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;1,6..96,400;1,6..96,500&family=Archivo+Expanded:wght@500;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/cart.css">
+<link rel="stylesheet" href="css/wishlist.css">
+<style>
+  .checkout-layout{ display:grid; grid-template-columns:1fr; gap:40px; max-width:1100px; margin:0 auto; padding:0 20px 80px; }
+  .checkout-layout[hidden], .order-card[hidden]{ display:none; }
+  .checkout-form h2, .checkout-layout .cart-summary h2{ margin:0 0 20px; font-family:'Bodoni Moda', serif; font-weight:500; font-size:1.5rem; }
+  .checkout-form h2:not(:first-child){ margin-top:36px; }
+  .field-grid{ display:grid; grid-template-columns:1fr; gap:18px; }
+  .field{ display:flex; flex-direction:column; gap:6px; }
+  .field label{ font-family:'Archivo Expanded', sans-serif; font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; }
+  .field label em{ font-style:normal; opacity:0.55; text-transform:none; letter-spacing:0; }
+  .field input, .field select, .field textarea{
+    min-height:48px; padding:11px 14px; border:1px solid rgba(92,22,38,0.28); border-radius:0;
+    background:transparent; color:var(--ink); font:inherit; font-size:0.95rem;
+  }
+  .field textarea{ resize:vertical; }
+  .field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible{ outline:2px solid var(--sangria); outline-offset:2px; }
+  .field.invalid input, .field.invalid select, .field.invalid textarea{ border-color:#b3261e; background:#fff6f5; }
+  .field-error{ min-height:1em; font-size:0.78rem; color:#b3261e; }
+  .form-summary-error{ margin:18px 0 0; font-size:0.85rem; color:#b3261e; }
+  .checkout-form .btn-primary{ margin-top:18px; }
+  .checkout-form .cart-continue{ display:inline-block; margin-left:18px; }
+  .summary-row-item{ display:flex; justify-content:space-between; gap:12px; padding:8px 0; font-size:0.88rem; border-bottom:1px solid var(--line); }
+  /* ---------- order confirmation card ---------- */
+  .checkout-section .order-card{
+    width:min(720px, calc(100% - 40px)); max-width:720px; margin:0 auto 90px; padding:0;
+    background:transparent; border:0; box-shadow:none; text-align:left;
+  }
+  .conf{
+    padding:clamp(28px, 5vw, 52px); text-align:center;
+    background:#fff; border:1px solid var(--line); box-shadow:0 18px 50px rgba(77,9,9,0.08);
+  }
+  .conf-check{
+    display:grid; place-items:center; width:64px; height:64px; margin:0 auto 18px;
+    border-radius:50%; background:var(--sangria); color:#fff;
+  }
+  .conf-eyebrow{ display:block; margin-bottom:10px; color:var(--sangria); font-family:'Archivo Expanded', sans-serif; font-size:0.65rem; letter-spacing:0.18em; text-transform:uppercase; }
+  .conf-title{
+    margin:0 0 12px; color:var(--sangria); font-family:'Bodoni Moda', serif; font-weight:500;
+    font-size:clamp(1.9rem, 4vw, 2.6rem); line-height:1.1; letter-spacing:0;
+    font-optical-sizing:none; font-variation-settings:'opsz' 28;
+  }
+  .conf-text{ max-width:30rem; margin:0 auto; font-size:0.95rem; line-height:1.6; opacity:0.8; }
+  .conf-text strong{ font-weight:500; opacity:1; }
+
+  .conf-meta{ display:grid; grid-template-columns:repeat(3, 1fr); margin:30px 0; border:1px solid var(--line); background:var(--blush); }
+  .conf-meta > div{ display:flex; flex-direction:column; gap:6px; padding:16px 10px; }
+  .conf-meta > div + div{ border-left:1px solid var(--line); }
+  .conf-meta span{ font-size:0.6rem; letter-spacing:0.14em; text-transform:uppercase; opacity:0.6; }
+  .conf-meta strong{ font-family:'Bodoni Moda', serif; font-weight:500; font-size:1.05rem; overflow-wrap:anywhere; }
+
+  .conf-grid{ display:grid; grid-template-columns:1fr; gap:14px; margin-bottom:14px; text-align:left; }
+  .conf-block{ padding:20px 22px; border:1px solid var(--line); text-align:left; }
+  .conf-block h3{ margin:0 0 12px; color:var(--sangria); font-family:'Archivo Expanded', sans-serif; font-weight:500; font-size:0.65rem; letter-spacing:0.14em; text-transform:uppercase; }
+  .conf-block address, .conf-block p{ margin:0; font-style:normal; font-size:0.92rem; line-height:1.7; overflow-wrap:anywhere; }
+  .conf-note{ margin-top:10px !important; font-size:0.82rem !important; opacity:0.7; }
+  .conf-items{ margin-bottom:28px; }
+  .conf-row{ display:flex; justify-content:space-between; gap:16px; padding:9px 0; font-size:0.92rem; border-bottom:1px solid var(--line); }
+  .conf-row em{ font-style:normal; opacity:0.6; }
+  .conf-sub{ font-size:0.85rem; opacity:0.8; }
+  .conf-row:last-child{ border-bottom:0; }
+  .conf-total{ margin-top:4px; padding-top:14px; border-top:1px solid var(--sangria); border-bottom:0; font-family:'Bodoni Moda', serif; font-size:1.2rem; opacity:1; }
+  .conf-actions{ display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:14px 26px; }
+  .conf-home{ color:var(--sangria); text-decoration:none; border-bottom:1px solid var(--line); padding-bottom:3px; font-family:'Archivo Expanded', sans-serif; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; }
+  .conf-home:hover{ border-bottom-color:var(--sangria); }
+  @media (min-width:641px){ .conf-grid{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:480px){ .conf-meta{ grid-template-columns:1fr; } .conf-meta > div + div{ border-left:0; border-top:1px solid var(--line); } }
+  @media (min-width:641px){ .field-grid{ grid-template-columns:1fr 1fr; } .field.full{ grid-column:1 / -1; } }
+  @media (min-width:901px){ .checkout-layout{ grid-template-columns:1.4fr 1fr; padding:0 40px 90px; align-items:start; } }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<header id="siteHeader" class="scrolled">
+  <div class="logo">RETRO <em>BELLA</em></div>
+  <nav class="links" id="navLinks">
+    <a href="index.html">Home</a>
+    <a href="shop.html" class="is-active">Shop</a>
+    <a href="lookbook.html">Lookbook</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+  <div class="header-icons">
+    <a href="login.html" class="icon-btn nav-text-btn">Sign In</a>
+    <a href="login.html?tab=signup" class="icon-btn nav-text-btn">Sign Up</a>
+    <a href="index.html" class="icon-btn nav-text-btn">Logout</a>
+    <a href="#" class="icon-btn wishlist-nav-link" aria-label="Wishlist" title="Wishlist">
+      <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg>
+    </a>
+    <a href="cart.html" class="icon-btn" aria-label="Cart">
+      <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h2l2.4 12.2a2 2 0 002 1.8h8.2a2 2 0 002-1.7L21 8H6"/><circle cx="10" cy="21" r="1.2"/><circle cx="18" cy="21" r="1.2"/></svg>
+    </a>
+  </div>
+  <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<section class="page-banner cart-banner">
+  <div class="breadcrumb"><a href="index.html">Home</a> / <a href="cart.html">Cart</a> / <span>Checkout</span></div>
+  <span class="label">Checkout</span>
+  <h1 id="bannerTitle">Your Details</h1>
+  <p class="sub" id="bannerSub">Tell us where to send your order.</p>
+</section>
+
+<section class="checkout-section">
+  <!-- step 1: customer details form (checkout.js builds the order summary) -->
+  <div class="checkout-layout" id="checkoutLayout">
+    <form class="checkout-form" id="checkoutForm" novalidate>
+      <h2>Contact</h2>
+      <div class="field-grid">
+        <div class="field">
+          <label for="fullName">Full name</label>
+          <input type="text" id="fullName" name="fullName" autocomplete="name" required>
+          <span class="field-error" id="fullName-error" role="alert"></span>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" autocomplete="email" required>
+          <span class="field-error" id="email-error" role="alert"></span>
+        </div>
+        <div class="field">
+          <label for="phone">Phone</label>
+          <input type="tel" id="phone" name="phone" autocomplete="tel" inputmode="tel" placeholder="+1 555 123 4567" required>
+          <span class="field-error" id="phone-error" role="alert"></span>
+        </div>
+      </div>
+
+      <h2>Shipping address</h2>
+      <div class="field-grid">
+        <div class="field full">
+          <label for="address1">Address</label>
+          <input type="text" id="address1" name="address1" autocomplete="address-line1" required>
+          <span class="field-error" id="address1-error" role="alert"></span>
+        </div>
+        <div class="field full">
+          <label for="address2">Apartment, suite, etc. <em>(optional)</em></label>
+          <input type="text" id="address2" name="address2" autocomplete="address-line2">
+          <span class="field-error" id="address2-error" role="alert"></span>
+        </div>
+        <div class="field">
+          <label for="city">City</label>
+          <input type="text" id="city" name="city" autocomplete="address-level2" required>
+          <span class="field-error" id="city-error" role="alert"></span>
+        </div>
+        <div class="field">
+          <label for="state">State / Province</label>
+          <input type="text" id="state" name="state" autocomplete="address-level1" required>
+          <span class="field-error" id="state-error" role="alert"></span>
+        </div>
+        <div class="field">
+          <label for="postal">Postal / ZIP code</label>
+          <input type="text" id="postal" name="postal" autocomplete="postal-code" required>
+          <span class="field-error" id="postal-error" role="alert"></span>
+        </div>
+        <div class="field">
+          <label for="country">Country</label>
+          <select id="country" name="country" autocomplete="country-name" required>
+            <option value="">Select a country</option>
+            <option>United States</option>
+            <option>Canada</option>
+            <option>United Kingdom</option>
+            <option>France</option>
+            <option>Germany</option>
+            <option>India</option>
+            <option>Australia</option>
+            <option>Other</option>
+          </select>
+          <span class="field-error" id="country-error" role="alert"></span>
+        </div>
+        <div class="field full">
+          <label for="notes">Delivery notes <em>(optional)</em></label>
+          <textarea id="notes" name="notes" rows="3" maxlength="300"></textarea>
+          <span class="field-error" id="notes-error" role="alert"></span>
+        </div>
+      </div>
+
+      <p class="form-summary-error" id="formError" role="alert"></p>
+      <button type="submit" class="btn-primary">
+        Place Order
+        <svg width="16" height="10" viewBox="0 0 16 10" fill="none"><path d="M1 5H15M15 5L11 1M15 5L11 9" stroke="currentColor" stroke-width="1.3"/></svg>
+      </button>
+      <a href="cart.html" class="cart-continue">Back to bag</a>
+    </form>
+
+    <aside class="cart-summary" id="checkoutSummary">
+      <h2>Order Summary</h2>
+      <div id="summaryItems"></div>
+      <div class="sum-row"><span>Subtotal</span><span id="coSubtotal">$0</span></div>
+      <div class="sum-row"><span>Shipping</span><span id="coShipping">—</span></div>
+      <div class="sum-row total"><span>Total</span><span id="coTotal">$0</span></div>
+    </aside>
+  </div>
+
+  <!-- step 2: confirmation (or "no order" message) -->
+  <div class="order-card" id="orderBox" hidden><!-- checkout.js shows the confirmation here --></div>
+</section>
+
+<footer>
+  <div class="brand">
+    <h3>RETRO <em style="color:var(--sangria)">BELLA</em></h3>
+    <p>A New York / Paris fashion house designing for the space between two cities.</p>
+  </div>
+  <div>
+    <span class="label">Shop</span>
+    <ul>
+      <li><a href="shop.html">New Arrivals</a></li>
+      <li><a href="shop.html">Outerwear</a></li>
+      <li><a href="shop.html">Accessories</a></li>
+    </ul>
+  </div>
+  <div>
+    <span class="label">House</span>
+    <ul>
+      <li><a href="about.html">About</a></li>
+      <li><a href="lookbook.html">Lookbook</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </div>
+  <div>
+    <span class="label">Follow</span>
+    <ul>
+      <li><a href="#">Instagram</a></li>
+      <li><a href="#">Pinterest</a></li>
+      <li><a href="#">TikTok</a></li>
+    </ul>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Retro Bella. All rights reserved.</span>
+    <span>New York — Paris</span>
+  </div>
+</footer>
+<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/wishlist.js"></script>
+<script src="js/main.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/checkout.js"></script>
+
+</body>
+</html>

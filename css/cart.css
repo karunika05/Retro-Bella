@@ -1,0 +1,99 @@
+/* RETRO BELLA — Cart page + Checkout page */
+
+/* count bubble on the header cart icon (every page) */
+.header-icons a[aria-label="Cart"]{ position:relative; }
+.cart-badge{
+  position:absolute; top:3px; right:1px; min-width:17px; height:17px; padding:0 4px;
+  border-radius:999px; background:#e04470; color:#fff;
+  font:10px/17px Inter, sans-serif; text-align:center; display:none;
+}
+.cart-badge.show{ display:block; }
+
+/* banner on the cart + checkout pages: same dark photo banner as the Shop page */
+.cart-banner{
+  position:relative; isolation:isolate; overflow:hidden;
+  padding:150px 5vw 110px;
+  background:#3a0808 url('../Images/bg.jpeg') center / cover no-repeat;
+}
+.cart-banner::before{
+  content:""; position:absolute; inset:0; z-index:-1;
+  background:linear-gradient(180deg, rgba(20,4,4,0.62), rgba(20,4,4,0.78));
+}
+.cart-banner .breadcrumb, .cart-banner .breadcrumb a, .cart-banner .breadcrumb span,
+.cart-banner .label, .cart-banner h1, .cart-banner .sub{ color:#fff !important; text-shadow:0 2px 10px rgba(0,0,0,0.6); }
+
+/* ---------- cart page ---------- */
+.cart-section{ padding:50px 20px 90px; }
+.cart-layout{ display:grid; grid-template-columns:1fr; gap:40px; max-width:1200px; margin:0 auto; }
+
+.cart-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding-bottom:16px; border-bottom:1px solid var(--line); font-size:0.85rem;
+}
+.cart-head button, .cart-remove, .cart-continue{
+  background:none; border:0; border-bottom:1px solid var(--line); padding:5px 0 3px; cursor:pointer;
+  color:var(--sangria); text-decoration:none;
+  font-family:'Archivo Expanded', sans-serif; font-size:0.62rem; letter-spacing:0.1em; text-transform:uppercase;
+}
+
+.cart-item{
+  display:grid; grid-template-columns:84px 1fr; gap:14px 16px;
+  padding:22px 0; border-bottom:1px solid var(--line);
+}
+.cart-thumb{ width:84px; height:108px; overflow:hidden; background:linear-gradient(160deg, var(--c1), var(--c2)); }
+.cart-thumb img{ display:block; width:100%; height:100%; object-fit:cover; }
+.cart-thumb.is-contain img{ object-fit:contain; background:#fff; padding:4px; }
+.cart-cat{ display:block; margin-bottom:4px; font-size:0.65rem; letter-spacing:0.14em; text-transform:uppercase; opacity:0.6; }
+.cart-info h3{ margin:0 0 4px; font-family:'Bodoni Moda', serif; font-style:italic; font-weight:400; font-size:1.15rem; }
+.cart-unit{ display:block; margin-bottom:10px; font-size:0.85rem; opacity:0.7; }
+.cart-qty{ grid-column:2; justify-self:start; display:inline-flex; align-items:center; border:1px solid rgba(92,22,38,0.28); }
+.cart-qty button{ width:38px; height:38px; background:none; border:0; color:inherit; font-size:1.1rem; cursor:pointer; }
+.cart-qty button:disabled{ opacity:0.35; cursor:default; }
+.cart-qty span{ min-width:30px; text-align:center; }
+.cart-line{ grid-column:2; font-family:'Bodoni Moda', serif; font-size:1.1rem; }
+
+/* order summary */
+.cart-summary{ padding:28px; background:var(--blush); align-self:start; }
+.cart-summary h2{ margin:0 0 18px; font-family:'Bodoni Moda', serif; font-weight:500; font-size:1.5rem; }
+.sum-row{ display:flex; justify-content:space-between; padding:6px 0; font-size:0.9rem; }
+.sum-row.total{ margin-top:10px; padding-top:14px; border-top:1px solid var(--line); font-size:1.1rem; font-weight:500; }
+.ship-note{ margin:12px 0 18px; font-size:0.8rem; opacity:0.75; }
+.cart-summary .btn-primary{ width:100%; justify-content:center; }
+.cart-continue{ display:inline-block; margin-top:18px; }
+
+.cart-empty{ display:none; max-width:30rem; margin:40px auto; text-align:center; }
+.cart-empty h2{ font-family:'Bodoni Moda', serif; font-weight:500; }
+.cart-empty p{ margin:8px 0 24px; opacity:0.7; }
+
+/* ---------- checkout page ---------- */
+.checkout-section{ padding:60px 20px 100px; }
+.order-card{ max-width:620px; margin:0 auto; text-align:center; }
+.order-check{
+  display:grid; place-items:center; width:76px; height:76px; margin:0 auto 26px;
+  border-radius:50%; background:var(--sangria); color:var(--paper);
+}
+.order-card h2{ margin:0 0 12px; font-family:'Bodoni Moda', serif; font-weight:500; font-size:clamp(1.7rem, 4vw, 2.3rem); }
+.order-text{ margin:0 0 10px; opacity:0.8; }
+.order-meta{ margin:0 0 30px; font-size:0.85rem; letter-spacing:0.04em; opacity:0.75; }
+.order-items{ padding:20px 24px; text-align:left; background:var(--blush); }
+.order-row{ display:flex; justify-content:space-between; gap:16px; padding:6px 0; font-size:0.9rem; }
+.order-row.total{ margin-top:8px; padding-top:14px; border-top:1px solid var(--line); font-size:1.05rem; font-weight:500; }
+.order-buttons{ display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:22px; margin-top:32px; }
+.order-home{
+  color:var(--sangria); text-decoration:none; border-bottom:1px solid var(--line); padding-bottom:3px;
+  font-family:'Archivo Expanded', sans-serif; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase;
+}
+
+.cart-head button:focus-visible, .cart-remove:focus-visible, .cart-continue:focus-visible,
+.cart-qty button:focus-visible, .order-home:focus-visible{ outline:2px solid var(--sangria); outline-offset:3px; }
+
+@media (min-width:641px){
+  .cart-item{ grid-template-columns:100px 1fr auto 110px; align-items:center; }
+  .cart-thumb{ width:100px; height:128px; }
+  .cart-qty, .cart-line{ grid-column:auto; justify-self:auto; }
+  .cart-line{ text-align:right; }
+}
+@media (min-width:901px){
+  .cart-section{ padding:60px 40px 110px; }
+  .cart-layout{ grid-template-columns:1fr 360px; }
+}

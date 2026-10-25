@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Wishlist — RETRO BELLA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;1,6..96,400;1,6..96,500&family=Archivo+Expanded:wght@500;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/cart.css">
+<style>
+  /* Wishlist page styles (kept here so the page works even without css/wishlist.css) */
+  .icon-btn .icon-svg{ width:19px; height:19px; }
+  .header-icons a[aria-label="Wishlist"]{ position:relative; }
+  .wishlist-badge{
+    position:absolute; top:3px; right:1px; min-width:17px; height:17px; padding:0 4px;
+    border-radius:999px; background:#e04470; color:#fff;
+    font:10px/17px Inter, sans-serif; text-align:center; display:none;
+  }
+  .wishlist-badge.show{ display:block; }
+
+  /* banner: same look as the Shop page */
+  .wishlist-banner{
+    position:relative; isolation:isolate; overflow:hidden;
+    padding:150px 5vw 110px;
+    background:#3a0808 url('Images/bg.jpeg') center / cover no-repeat;
+  }
+  .wishlist-banner::before{
+    content:""; position:absolute; inset:0; z-index:-1;
+    background:linear-gradient(180deg, rgba(20,4,4,0.62), rgba(20,4,4,0.78));
+  }
+  .wishlist-banner, .wishlist-banner a, .wishlist-banner span, .wishlist-banner h1, .wishlist-banner p{ color:#fff !important; text-shadow:0 2px 10px rgba(0,0,0,0.6); }
+  .wishlist-banner .breadcrumb{ margin-bottom:28px; font-size:0.7rem; letter-spacing:0.14em; text-transform:uppercase; }
+  .wishlist-banner .eyebrow{ display:block; margin-bottom:14px; font-family:'Archivo Expanded', sans-serif; font-size:0.7rem; letter-spacing:0.18em; }
+  .wishlist-banner h1{ margin:0 0 16px; font-family:'Bodoni Moda', serif; font-weight:500; font-size:clamp(2.6rem, 6vw, 4.6rem); line-height:1.05; }
+  .wishlist-banner p{ max-width:34rem; margin:0; font-weight:300; line-height:1.6; }
+
+  .wishlist-main{ padding:0 20px 80px; }
+  .wishlist-toolbar{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; padding:36px 0 28px; }
+  #wishlistCount{ font-family:'Archivo Expanded', sans-serif; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; }
+  .continue-shopping{
+    color:var(--sangria); text-decoration:none; border-bottom:1px solid var(--line); padding-bottom:3px;
+    font-family:'Archivo Expanded', sans-serif; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase;
+  }
+
+  .wishlist-grid{ display:grid; grid-template-columns:1fr; gap:40px 28px; }
+  .wishlist-card{ display:flex; flex-direction:column; }
+  .wishlist-photo{ aspect-ratio:4 / 5; overflow:hidden; background:linear-gradient(160deg, var(--c1), var(--c2)); }
+  .wishlist-photo img{ display:block; width:100%; height:100%; object-fit:cover; }
+  .wishlist-photo img.fit-contain{ object-fit:contain; background:#fff; padding:12px; }
+  .wishlist-info{ display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:4px 12px; padding:16px 0 12px; }
+  .wishlist-category{ flex-basis:100%; font-size:0.65rem; letter-spacing:0.14em; text-transform:uppercase; opacity:0.6; }
+  .wishlist-info h2{ margin:0; font-family:'Bodoni Moda', serif; font-style:italic; font-weight:400; font-size:1.15rem; }
+  .wishlist-price{ font-family:'Bodoni Moda', serif; font-style:italic; }
+  .wishlist-actions{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:auto; }
+  .wishlist-add, .wishlist-buy{
+    min-height:44px; padding:12px 10px; cursor:pointer;
+    font-family:'Archivo Expanded', sans-serif; font-size:11px; letter-spacing:1.2px; text-transform:uppercase;
+    transition:background 0.25s ease, color 0.25s ease;
+  }
+  .wishlist-add{ background:#2c1010; color:#fff; border:1px solid #2c1010; }
+  .wishlist-add:hover{ background:var(--sangria); border-color:var(--sangria); }
+  .wishlist-buy{ background:none; color:var(--sangria); border:1px solid var(--sangria); }
+  .wishlist-buy:hover{ background:var(--sangria); color:var(--paper); }
+  .wishlist-remove{
+    grid-column:1 / -1; justify-self:start; background:none; border:0; border-bottom:1px solid var(--line);
+    padding:6px 0 3px; cursor:pointer; color:var(--sangria);
+    font-family:'Archivo Expanded', sans-serif; font-size:0.62rem; letter-spacing:0.1em; text-transform:uppercase;
+  }
+  .wishlist-add:focus-visible, .wishlist-buy:focus-visible, .wishlist-remove:focus-visible, .continue-shopping:focus-visible{
+    outline:2px solid var(--sangria); outline-offset:3px;
+  }
+
+  .wishlist-empty{ padding:70px 0; text-align:center; }
+  .wishlist-empty[hidden]{ display:none; }
+  .empty-heart{ font-size:3rem; color:var(--sangria); }
+  .wishlist-empty h2{ margin:10px 0; font-family:'Bodoni Moda', serif; font-weight:500; }
+  .wishlist-empty p{ margin:0 0 22px; opacity:0.7; }
+  .primary-link{
+    display:inline-block; padding:14px 28px; background:var(--sangria); color:var(--paper); text-decoration:none;
+    font-family:'Archivo Expanded', sans-serif; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase;
+  }
+
+  @media (min-width:641px){ .wishlist-grid{ grid-template-columns:repeat(2, 1fr); } }
+  @media (min-width:901px){ .wishlist-main{ padding:0 40px 90px; } }
+  @media (min-width:981px){ .wishlist-grid{ grid-template-columns:repeat(4, 1fr); } }
+</style>
+</head>
+<body>
+<div class="grain"></div><div class="cursor-dot" id="cursorDot"></div>
+
+<header id="siteHeader" class="scrolled">
+  <div class="logo">RETRO <em>BELLA</em></div>
+  <nav class="links" id="navLinks">
+    <a href="index.html">Home</a>
+    <a href="shop.html" class="is-active">Shop</a>
+    <a href="lookbook.html">Lookbook</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+  <div class="header-icons">
+    <a href="login.html" class="icon-btn nav-text-btn">Sign In</a>
+    <a href="login.html?tab=signup" class="icon-btn nav-text-btn">Sign Up</a>
+    <a href="index.html" class="icon-btn nav-text-btn">Logout</a>
+    <a href="wishlist.html" class="icon-btn wishlist-nav-link" aria-label="Wishlist" title="Wishlist">
+      <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg>
+    </a>
+    <a href="cart.html" class="icon-btn" aria-label="Cart">
+      <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h2l2.4 12.2a2 2 0 002 1.8h8.2a2 2 0 002-1.7L21 8H6"/><circle cx="10" cy="21" r="1.2"/><circle cx="18" cy="21" r="1.2"/></svg>
+    </a>
+  </div>
+  <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+<section class="wishlist-banner">
+  <div class="breadcrumb"><a href="index.html">Home</a> / <a href="shop.html">Shop</a> / <span>Wishlist</span></div>
+  <span class="eyebrow">YOUR SAVED PIECES</span>
+  <h1>My <em>Wishlist</em></h1>
+  <p>Keep the pieces you love close. You can add them to your cart anytime.</p>
+</section>
+<main class="wishlist-main">
+  <div class="wishlist-toolbar"><span id="wishlistCount">0 pieces saved</span><a href="shop.html" class="continue-shopping">Continue shopping ↗</a></div>
+  <div id="wishlistGrid" class="wishlist-grid" aria-live="polite"></div>
+  <section id="wishlistEmpty" class="wishlist-empty" hidden>
+    <div class="empty-heart">♡</div><h2>Your wishlist is waiting</h2>
+    <p>Tap the heart on any piece to save it here.</p><a href="shop.html" class="primary-link">Explore the collection</a>
+  </section>
+</main>
+<footer>
+  <div class="brand"><h3>RETRO <em style="color:var(--sangria)">BELLA</em></h3><p>A New York / Paris fashion house designing for the space between two cities.</p></div>
+  <div><span class="label">Shop</span><ul><li><a href="shop.html">New Arrivals</a></li><li><a href="shop.html">Outerwear</a></li><li><a href="shop.html">Footwear</a></li></ul></div>
+  <div><span class="label">House</span><ul><li><a href="about.html">About</a></li><li><a href="lookbook.html">Lookbook</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+  <div><span class="label">Follow</span><ul><li><a href="#">Instagram</a></li><li><a href="#">Pinterest</a></li><li><a href="#">TikTok</a></li></ul></div>
+  <div class="footer-bottom"><span>© 2026 Retro Bella. All rights reserved.</span><span>New York — Paris</span></div>
+</footer>
+<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/wishlist.js"></script>
+<script src="js/main.js"></script>
+   <script src="js/auth.js"></script>
+
+
+</body></html>
