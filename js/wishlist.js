@@ -14,6 +14,33 @@ window.Wishlist = {
   },
   has(id) { return this.ids().includes(id); },
 
+  // PROMISE 1: resolve when the requested product exists; reject when it does not.
+  getProductByIdAsync(id) {
+    return Promise.resolve().then(() => {
+      if (typeof getProductById !== 'function') {
+        throw new Error('getProductById is not available. Check products.js script order.');
+      }
+
+      const product = getProductById(id);
+      if (!product) throw new Error('Product not found: ' + id);
+      return product;
+    });
+  },
+
+  // PROMISE 2: asynchronously load all products currently saved in the wishlist.
+  getProductsAsync() {
+    return Promise.resolve().then(() => {
+      return this.ids().map(id => {
+        try {
+          return typeof getProductById === 'function' ? (getProductById(id) || null) : null;
+        } catch (error) {
+          console.warn('Could not find wishlist product:', id);
+          return null;
+        }
+      }).filter(Boolean);
+    });
+  },
+
   // add or remove; returns true if the product is now saved
   toggle(id) {
     const ids = this.ids();
@@ -68,9 +95,15 @@ document.addEventListener('DOMContentLoaded', () => {
   overlay.addEventListener('click', close);
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && drawer.classList.contains('open')) close(); });
 
-  // ---------- draw the saved pieces ----------
-  function render() {
-    const products = Wishlist.ids().map(getProductById).filter(Boolean);
+  // ---------- draw the saved pieces using the Wishlist Promise ----------
+  async function render() {
+    let products;
+    try {
+      products = await Wishlist.getProductsAsync();
+    } catch (error) {
+      console.error('Wishlist Promise failed:', error);
+      products = [];
+    }
     document.getElementById('wlCount').textContent = products.length ? '(' + products.length + ')' : '';
 
     list.innerHTML = products.length ? products.map(p => `

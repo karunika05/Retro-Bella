@@ -1,0 +1,104 @@
+/* RETRO BELLA — Dark mode
+   Loaded last on every page. The dark palette only applies when <html data-theme="dark">
+   (set by the tiny script in <head> and by js/theme.js). */
+
+/* ---------- toggle button (works in both themes) ---------- */
+.theme-toggle{ position:relative; font:inherit; }
+.theme-toggle svg{ width:19px; height:19px; display:block; }
+.theme-toggle .ico-sun{ display:none; }
+:root[data-theme="dark"] .theme-toggle .ico-sun{ display:block; }
+:root[data-theme="dark"] .theme-toggle .ico-moon{ display:none; }
+.theme-toggle:focus-visible{ outline:2px solid var(--sangria); outline-offset:2px; }
+/* login page has no header, so its button floats in the corner */
+.theme-toggle--float{
+  position:fixed; top:14px; right:14px; z-index:950;
+  background:var(--paper); color:var(--ink); border:1px solid var(--line); border-radius:50%;
+}
+/* smooth colour change when toggling (class is added for 0.4s by theme.js) */
+html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after{
+  transition:background-color .35s ease, color .35s ease, border-color .35s ease !important;
+}
+
+/* ---------- dark palette ---------- */
+:root[data-theme="dark"]{
+  color-scheme:dark;                 /* dark scrollbars, date pickers, select menus */
+  --ink:#F3E6DA;
+  --ink-rgb:243,230,218;
+  --paper:#170B0B;
+  --paper-dim:#211111;
+  --sangria:#E8A9A0;                 /* accent: links, buttons, hearts */
+  --sangria-dim:#D48D84;
+  --line:rgba(243,230,218,0.16);
+  --dusk:#211212;
+  --dusk-dim:#2B1818;
+  --blush:#2A1616;
+  --blush-dim:#331C1C;
+  --border:rgba(243,230,218,.16);
+}
+
+/* header */
+:root[data-theme="dark"] header.scrolled{ background:rgba(23,11,11,0.92); }
+:root[data-theme="dark"] .grain{ mix-blend-mode:screen; opacity:0.03; }
+
+/* text that sits ON photos/video must stay light in both themes */
+:root[data-theme="dark"] header.on-video:not(.scrolled) .logo,
+:root[data-theme="dark"] header.on-video:not(.scrolled) nav.links a,
+:root[data-theme="dark"] header.on-video:not(.scrolled) .header-icons,
+:root[data-theme="dark"] .hero,
+:root[data-theme="dark"] .hero-caption,
+:root[data-theme="dark"] .btn-outline,
+:root[data-theme="dark"] .scroll-cue,
+:root[data-theme="dark"] .panel-label h3,
+:root[data-theme="dark"] .panel-reveal h3,
+:root[data-theme="dark"] .panel-link,
+:root[data-theme="dark"] .editorial-block .img::after,
+:root[data-theme="dark"] .lookbook-masonry figcaption{ color:#FFFCF6; }
+:root[data-theme="dark"] .btn-outline:hover{ background:#FFFCF6; color:#4D0909; border-color:#FFFCF6; }
+
+/* dark cherry panels keep their deep red + light text */
+:root[data-theme="dark"] .stats-row{ background:#3A0A0A; color:#FFFCF6; }
+:root[data-theme="dark"] .auth-side{ background:linear-gradient(160deg,#4D0909,#2A0505); color:#FFFCF6; }
+:root[data-theme="dark"] .auth-side .logo{ color:#FFFCF6; }
+
+/* near-black buttons become light buttons */
+:root[data-theme="dark"] .add-cart-btn,
+:root[data-theme="dark"] .wishlist-add,
+:root[data-theme="dark"] .wl-add{ background:#F3E6DA; color:#170B0B; border-color:#F3E6DA; }
+:root[data-theme="dark"] .add-cart-btn:hover,
+:root[data-theme="dark"] .wishlist-add:hover,
+:root[data-theme="dark"] .wl-add:hover{ background:var(--sangria); border-color:var(--sangria); color:#170B0B; }
+
+/* shop cards */
+:root[data-theme="dark"] .wishlist-btn{ background:rgba(23,11,11,0.88); color:var(--ink); border-color:rgba(243,230,218,.28); }
+:root[data-theme="dark"] .wishlist-btn:hover{ background:var(--paper); }
+:root[data-theme="dark"] .wishlist-btn.is-wishlisted{ background:rgba(224,68,112,.2); color:#ff7a9c; border-color:#ff7a9c; }
+:root[data-theme="dark"] .wishlist-btn.is-wishlisted svg{ fill:#ff7a9c; }
+:root[data-theme="dark"] .cart-feedback{ color:var(--ink); }
+:root[data-theme="dark"] .filter-search::placeholder{ color:rgba(243,230,218,0.5); }
+:root[data-theme="dark"] .color-dot{ border-color:rgba(243,230,218,0.35); }
+
+/* forms / checkout */
+:root[data-theme="dark"] .field.invalid input,
+:root[data-theme="dark"] .field.invalid select,
+:root[data-theme="dark"] .field.invalid textarea{ border-color:#ff8a80; background:rgba(255,138,128,0.12); }
+:root[data-theme="dark"] .field-error,
+:root[data-theme="dark"] .form-summary-error{ color:#ff8a80; }
+:root[data-theme="dark"] .conf{ background:var(--blush); box-shadow:0 18px 50px rgba(0,0,0,0.4); }
+:root[data-theme="dark"] .conf-check{ color:#170B0B; }
+:root[data-theme="dark"] .captcha-box{
+  background:repeating-linear-gradient(135deg,#2A1616,#2A1616 5px,#331C1C 5px,#331C1C 10px);
+}
+:root[data-theme="dark"] .stl-media{ box-shadow:0 14px 30px rgba(0,0,0,0.5); }
+:root[data-theme="dark"] .spotlight-copy p{ color:rgba(var(--ink-rgb),0.72); }
+:root[data-theme="dark"] .newsletter input::placeholder{ color:rgba(var(--ink-rgb),0.4); }
+
+/* about page inline borders */
+:root[data-theme="dark"] .press-strip,
+:root[data-theme="dark"] .pull-quote{ border-bottom-color:rgba(243,230,218,0.12); }
+:root[data-theme="dark"] .about-cta a.btn-primary,
+:root[data-theme="dark"] .shop-cta a.btn-primary{ background:var(--sangria); color:#170B0B; }
+
+/* product photos on white (fit-contain) stay white so cut-out shots look right;
+   gradient placeholders get a little dimmer */
+:root[data-theme="dark"] img{ filter:brightness(0.92); }
+:root[data-theme="dark"] .fit-contain, :root[data-theme="dark"] .is-contain img{ filter:brightness(0.9); }

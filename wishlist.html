@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>/* ADDED: apply saved/OS theme before first paint (no flash) */(function(){try{var t=localStorage.getItem("rb_theme");if(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)t="dark";if(t==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}})();</script>
 <title>My Wishlist — RETRO BELLA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -86,6 +87,7 @@
   @media (min-width:901px){ .wishlist-main{ padding:0 40px 90px; } }
   @media (min-width:981px){ .wishlist-grid{ grid-template-columns:repeat(4, 1fr); } }
 </style>
+<link rel="stylesheet" href="css/dark.css"> <!-- ADDED: dark mode -->
 </head>
 <body>
 <div class="grain"></div><div class="cursor-dot" id="cursorDot"></div>
@@ -109,6 +111,11 @@
     <a href="cart.html" class="icon-btn" aria-label="Cart">
       <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h2l2.4 12.2a2 2 0 002 1.8h8.2a2 2 0 002-1.7L21 8H6"/><circle cx="10" cy="21" r="1.2"/><circle cx="18" cy="21" r="1.2"/></svg>
     </a>
+    <button type="button" class="icon-btn theme-toggle" id="themeToggle" aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode">
+      <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7Z"/></svg>
+      <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg>
+    </button>
+
   </div>
   <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">
     <span></span><span></span><span></span>
@@ -142,4 +149,5 @@
    <script src="js/auth.js"></script>
 
 
+<script src="js/theme.js"></script> <!-- ADDED: dark mode -->
 </body></html>

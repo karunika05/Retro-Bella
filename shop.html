@@ -3,11 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>/* ADDED: apply saved/OS theme before first paint (no flash) */(function(){try{var t=localStorage.getItem("rb_theme");if(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)t="dark";if(t==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}})();</script>
 <title>Shop All — RETRO&nbsp;BELLA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;1,6..96,400;1,6..96,500&family=Archivo+Expanded:wght@500;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/cart.css">
+<link rel="stylesheet" href="css/wishlist.css">
 <style>
   .page-banner{
     position:relative;
@@ -52,10 +55,10 @@
     background:#ffffff;
     padding:12px;
   }
-  .icon-btn .icon-svg{
-    width:19px;
-    height:19px;
-  }
+  .icon-btn .icon-svg{ width:19px; height:19px; }
+  .header-icons .icon-btn[aria-label="Wishlist"], .header-icons .icon-btn[aria-label="Cart"]{position:relative;}
+  .wishlist-badge,.cart-badge{position:absolute;top:3px;right:1px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:#e04470;color:#fff;font:10px/17px Inter,sans-serif;text-align:center;display:none;}
+  .wishlist-badge.show,.cart-badge.show{display:block;}
 
   /* ---------- Filter bar: same theme, just pill-shaped + centered ---------- */
   .filter-bar{
@@ -99,7 +102,97 @@
   .add-cart-btn:hover{
     background:var(--sangria, #4D0909);
   }
+  .wishlist-btn{
+    width:44px; min-width:44px; height:42px; display:inline-flex;
+    align-items:center; justify-content:center; background:transparent;
+    border:1px solid rgba(77,9,9,.28); border-radius:2px; color:#4D0909;
+    cursor:pointer; transition:color .2s ease, background .2s ease, border-color .2s ease;
+  }
+  .wishlist-btn svg{width:21px;height:21px;fill:transparent;stroke:currentColor;stroke-width:1.8;transition:fill .2s ease;}
+  .wishlist-btn.is-wishlisted{color:#e04470;border-color:#e04470;background:#fff5f7;}
+  .wishlist-btn.is-wishlisted svg{fill:#e04470;}
+  .wishlist-btn:focus-visible,.add-cart-btn:focus-visible{outline:2px solid #e04470;outline-offset:3px;}
+  .cart-feedback{font-size:12px;padding:0 16px 12px;color:#4D0909;}
+
+  /* size list on each card */
+  .product-sizes{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; padding:2px 16px 0; font-size:0.7rem; }
+  .product-sizes em{ margin-right:4px; font-style:normal; text-transform:uppercase; letter-spacing:0.1em; opacity:0.6; }
+  .product-sizes span{ padding:2px 7px; border:1px solid var(--line); }
+
+  /* =========================================================
+     SHOP — advanced filters (toolbar, panel, chips)
+     Search, sort, result count, price / size / colour panel.
+     ========================================================= */
+  .filter-toolbar{ display:flex; flex-wrap:wrap; align-items:center; gap:14px; padding:0 20px 24px; }
+  .filter-toggle{
+    display:inline-flex; align-items:center; gap:10px;
+    min-height:48px; padding:11px 22px; border:1px solid rgba(var(--ink-rgb),0.28);
+    background:none; color:var(--ink); cursor:pointer;
+    font-family:'Archivo Expanded', sans-serif; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase;
+    transition:background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  }
+  .filter-toggle:hover, .filter-toggle[aria-expanded="true"]{ background:var(--sangria); color:var(--paper); border-color:var(--sangria); }
+  .filter-badge{
+    display:inline-grid; place-items:center; min-width:20px; height:20px; padding:0 6px;
+    border-radius:999px; background:var(--sangria); color:var(--paper); font-size:0.65rem; letter-spacing:0;
+  }
+  .filter-badge[hidden]{ display:none; }
+  .filter-toggle:hover .filter-badge, .filter-toggle[aria-expanded="true"] .filter-badge{ background:var(--paper); color:var(--sangria); }
+
+  .filter-search{
+    flex:1 1 220px; min-width:0; min-height:48px; padding:11px 16px;
+    border:1px solid rgba(var(--ink-rgb),0.28); border-radius:0; background:transparent;
+    color:var(--ink); font:inherit; font-size:0.9rem;
+  }
+  .filter-search::placeholder{ color:rgba(77,9,9,0.5); }
+  .result-count{ font-size:0.8rem; opacity:0.7; white-space:nowrap; }
+  .sort-wrap{
+    display:inline-flex; align-items:center; gap:10px;
+    font-family:'Archivo Expanded', sans-serif; font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase;
+  }
+  .sort-wrap select{
+    min-height:48px; padding:0 12px; border:1px solid rgba(var(--ink-rgb),0.28); border-radius:0;
+    background:transparent; color:var(--ink); font:inherit; font-size:0.85rem; letter-spacing:0; text-transform:none; cursor:pointer;
+  }
+  .filter-toggle:focus-visible, .filter-search:focus-visible, .sort-wrap select:focus-visible,
+  .size-chip:focus-visible, .color-chip:focus-visible, .filter-clear:focus-visible, .check-row input:focus-visible{
+    outline:2px solid var(--sangria); outline-offset:3px;
+  }
+
+  .filter-panel{
+    display:grid; grid-template-columns:1fr; gap:28px;
+    margin:0 20px 32px; padding:28px 24px;
+    border:1px solid var(--line); background:var(--blush);
+  }
+  .filter-panel[hidden]{ display:none; }
+  .filter-group .label{ display:block; margin:0 0 14px; color:var(--sangria); }
+  .check-row{ display:flex; align-items:center; gap:10px; min-height:36px; font-size:0.9rem; cursor:pointer; }
+  .check-row input{ width:18px; height:18px; accent-color:var(--sangria); cursor:pointer; }
+  .sub-h{ display:block; margin:16px 0 8px; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; opacity:0.65; }
+  .chip-row, .color-grid{ display:flex; flex-wrap:wrap; gap:8px; }
+  .size-chip, .color-chip{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    min-height:40px; min-width:44px; padding:8px 14px;
+    border:1px solid rgba(var(--ink-rgb),0.28); background:none; color:var(--ink); cursor:pointer;
+    font-family:'Archivo Expanded', sans-serif; font-size:0.7rem; letter-spacing:0.08em; text-transform:uppercase;
+    transition:background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  }
+  .size-chip:hover, .color-chip:hover, .size-chip.active, .color-chip.active{ background:var(--sangria); color:var(--paper); border-color:var(--sangria); }
+  .color-dot{ flex:none; width:14px; height:14px; border-radius:50%; border:1px solid rgba(0,0,0,0.25); }
+  .filter-actions{ grid-column:1 / -1; display:flex; justify-content:flex-end; }
+  .filter-clear{
+    background:none; border:0; border-bottom:1px solid var(--line); padding:12px 0 4px; cursor:pointer;
+    color:var(--sangria); font-family:'Archivo Expanded', sans-serif; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase;
+  }
+  .filter-clear:hover{ border-bottom-color:var(--sangria); }
+
+  @media (min-width:641px){ .result-count{ margin-left:auto; } }
+  @media (min-width:901px){
+    .filter-toolbar{ padding:0 40px 28px; }
+    .filter-panel{ grid-template-columns:repeat(3, 1fr); margin:0 40px 36px; }
+  }
 </style>
+<link rel="stylesheet" href="css/dark.css"> <!-- ADDED: dark mode -->
 </head>
 <body>
 
@@ -119,16 +212,24 @@
     <a href="login.html" class="icon-btn nav-text-btn">Sign In</a>
     <a href="login.html?tab=signup" class="icon-btn nav-text-btn">Sign Up</a>
     <a href="index.html" class="icon-btn nav-text-btn">Logout</a>
-    <a href="#" class="icon-btn" aria-label="Cart">
+    <a href="#" class="icon-btn wishlist-nav-link" aria-label="Wishlist" title="Wishlist">
+      <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg>
+    </a>
+    <a href="cart.html" class="icon-btn" aria-label="Cart">
       <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h2l2.4 12.2a2 2 0 002 1.8h8.2a2 2 0 002-1.7L21 8H6"/><circle cx="10" cy="21" r="1.2"/><circle cx="18" cy="21" r="1.2"/></svg>
     </a>
+    <button type="button" class="icon-btn theme-toggle" id="themeToggle" aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode">
+      <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.8 6.8 0 0 0 10.7 10.7Z"/></svg>
+      <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg>
+    </button>
+
   </div>
   <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">
     <span></span><span></span><span></span>
   </button>
 </header>
 
-<section class="page-banner">
+<section class="page-banner shop-banner">
   <div class="breadcrumb"><a href="index.html">Home</a> / <span>Shop</span></div>
   <span class="label">The Collection</span>
   <h1>Shop All</h1>
@@ -144,650 +245,64 @@
   <button class="filter-pill" data-filter="footwear">Footwear</button>
 </div>
 
+<div class="filter-toolbar">
+  <button type="button" class="filter-toggle" id="filterToggle" aria-expanded="false" aria-controls="filterPanel">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6h18M6 12h12M10 18h4"/></svg>
+    Filters <span class="filter-badge" id="filterBadge" hidden>0</span>
+  </button>
+  <input type="search" class="filter-search" id="searchInput" placeholder="Search pieces" aria-label="Search pieces" autocomplete="off">
+  <span class="result-count" id="resultCount" aria-live="polite"></span>
+  <label class="sort-wrap"><span>Sort by</span>
+    <select id="sortSelect">
+      <option value="featured">Featured</option>
+      <option value="price-asc">Price: Low to High</option>
+      <option value="price-desc">Price: High to Low</option>
+      <option value="name-asc">Name: A to Z</option>
+    </select>
+  </label>
+</div>
+
+<div class="filter-panel" id="filterPanel" hidden>
+  <div class="filter-group" data-group="price">
+    <h4 class="label">Price</h4>
+    <label class="check-row"><input type="checkbox" value="0-500"> $0 – $500</label>
+    <label class="check-row"><input type="checkbox" value="500-1000"> $500 – $1,000</label>
+    <label class="check-row"><input type="checkbox" value="1000-1000000"> $1,000 &amp; above</label>
+  </div>
+  <div class="filter-group" data-group="size">
+    <h4 class="label">Size</h4>
+    <div class="chip-row">
+      <button type="button" class="size-chip" data-value="XS">XS</button>
+      <button type="button" class="size-chip" data-value="S">S</button>
+      <button type="button" class="size-chip" data-value="M">M</button>
+      <button type="button" class="size-chip" data-value="L">L</button>
+      <button type="button" class="size-chip" data-value="XL">XL</button>
+      <button type="button" class="size-chip" data-value="XXL">XXL</button>
+    </div>
+    <span class="sub-h">Shoe size (US)</span>
+    <div class="chip-row">
+      <button type="button" class="size-chip" data-value="6">6</button>
+      <button type="button" class="size-chip" data-value="7">7</button>
+      <button type="button" class="size-chip" data-value="8">8</button>
+      <button type="button" class="size-chip" data-value="9">9</button>
+      <button type="button" class="size-chip" data-value="10">10</button>
+    </div>
+    <span class="sub-h">Bags</span>
+    <div class="chip-row">
+      <button type="button" class="size-chip" data-value="One Size">One Size</button>
+    </div>
+  </div>
+  <div class="filter-group" data-group="color">
+    <h4 class="label">Colour</h4>
+    <div class="color-grid" id="colorGrid"></div>
+  </div>
+  <div class="filter-actions">
+    <button type="button" class="filter-clear" id="filterClear">Clear filters</button>
+  </div>
+</div>
+
 <div class="product-grid" id="productGrid">
-
-  <!-- WOMEN -->
-  <div class="product-card" data-cat="women" style="--c1:#F7ECE4; --c2:#C9998C;">
-    <div class="product-media">
-      <img src="Images/top1.jpg" alt="Structured Blazer" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Structured Blazer</h3><span class="cat-label">Women</span></div>
-      <span class="product-price">$420</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="women" style="--c1:#F2E3D8; --c2:#E4CFC2;">
-    <div class="product-media">
-      <img src="Images/top2.jpg" alt="Silk Wrap Blouse" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Silk Wrap Blouse</h3><span class="cat-label">Women</span></div>
-      <span class="product-price">$260</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="women" style="--c1:#C9998C; --c2:#4D0909;">
-    <div class="product-media">
-      <img src="Images/top3.jpg" alt="Tapered Wool Trousers" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Tapered Wool Trousers</h3><span class="cat-label">Women</span></div>
-      <span class="product-price">$340</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="women" style="--c1:#F2E3D8; --c2:#B37868;">
-    <div class="product-media">
-      <img src="Images/top4.jpg" alt="Product name" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Product Name</h3><span class="cat-label">Women</span></div>
-      <span class="product-price">$000</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="women" style="--c1:#E4CFC2; --c2:#4D0909;">
-    <div class="product-media">
-      <img src="Images/top5.jpg" alt="Product name" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Product Name</h3><span class="cat-label">Women</span></div>
-      <span class="product-price">$000</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="women" style="--c1:#F7ECE4; --c2:#320606;">
-    <div class="product-media">
-      <img src="Images/top6.jpg" alt="Product name" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Product Name</h3><span class="cat-label">Women</span></div>
-      <span class="product-price">$000</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="women" style="--c1:#C9998C; --c2:#B37868;">
-    <div class="product-media">
-      <img src="Images/top7.jpg" alt="Product name" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Product Name</h3><span class="cat-label">Women</span></div>
-      <span class="product-price">$000</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="women" style="--c1:#F2E3D8; --c2:#4D0909;">
-    <div class="product-media">
-      <img src="Images/top8.jpg" alt="Product name" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Product Name</h3><span class="cat-label">Women</span></div>
-      <span class="product-price">$000</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="women" style="--c1:#E4CFC2; --c2:#320606;">
-    <div class="product-media">
-      <img src="Images/top9.jpg" alt="Product name" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Product Name</h3><span class="cat-label">Women</span></div>
-      <span class="product-price">$000</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="women" style="--c1:#F7ECE4; --c2:#B37868;">
-    <div class="product-media">
-      <img src="Images/top10.jpg" alt="Product name" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Product Name</h3><span class="cat-label">Women</span></div>
-      <span class="product-price">$000</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="women" style="--c1:#F7ECE4; --c2:#B37868;">
-    <div class="product-media">
-      <img src="Images/top11.jpg" alt="Product name" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Product Name</h3><span class="cat-label">Women</span></div>
-      <span class="product-price">$000</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="women" style="--c1:#F7ECE4; --c2:#B37868;">
-    <div class="product-media">
-      <img src="Images/top12.jpg" alt="Product name" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Product Name</h3><span class="cat-label">Women</span></div>
-      <span class="product-price">$000</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <!-- MEN -->
- <!-- MEN -->
-  <div class="product-card" data-cat="men" style="--c1:#B37868; --c2:#4D0909;">
-    <div class="product-media">
-      <img src="Images/men1.jpeg" alt="Men's overcoat" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Half-Black Knitted Collar Shirt</h3><span class="cat-label">Men</span></div>
-      <span class="product-price">$560</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="men" style="--c1:#E4CFC2; --c2:#4D0909;">
-    <div class="product-media">
-      <img src="images/men2.jpeg" alt="Men's knitwear" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Half-White Knitted Collar Shirt</h3><span class="cat-label">Men</span></div>
-      <span class="product-price">$190</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="men" style="--c1:#320606; --c2:#320606;">
-    <div class="product-media">
-      <img src="Images/men3.jpeg" alt="Men's trousers" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Black T-Shirt</h3><span class="cat-label">Men</span></div>
-      <span class="product-price">$310</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="men" style="--c1:#B37868; --c2:#4D0909;">
-    <div class="product-media">
-      <img src="Images/men4.jpeg" alt="Men's overcoat" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Knitted Brown Shirt</h3><span class="cat-label">Men</span></div>
-      <span class="product-price">$560</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="men" style="--c1:#B37868; --c2:#4D0909;">
-    <div class="product-media">
-      <img src="Images/men5.jpeg" alt="Men's overcoat" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Cotton Half Sleeved Black Shirt</h3><span class="cat-label">Men</span></div>
-      <span class="product-price">$560</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="men" style="--c1:#B37868; --c2:#4D0909;">
-    <div class="product-media">
-      <img src="Images/men6.jpeg" alt="Men's overcoat" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Full Sleeves White Shirt</h3><span class="cat-label">Men</span></div>
-      <span class="product-price">$560</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="men" style="--c1:#B37868; --c2:#4D0909;">
-    <div class="product-media">
-      <img src="Images/men7.jpeg" alt="Men's overcoat" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>White Shirt with Black Stripes</h3><span class="cat-label">Men</span></div>
-      <span class="product-price">$560</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="men" style="--c1:#B37868; --c2:#4D0909;">
-    <div class="product-media">
-      <img src="Images/men8.jpeg" alt="Men's overcoat" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Sea-Blue Cotton Shirt</h3><span class="cat-label">Men</span></div>
-      <span class="product-price">$560</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="men" style="--c1:#B37868; --c2:#4D0909;">
-    <div class="product-media">
-      <img src="Images/men9.jpeg" alt="Men's overcoat" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Designer Full Sleeves Shirt</h3><span class="cat-label">Men</span></div>
-      <span class="product-price">$560</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="men" style="--c1:#B37868; --c2:#4D0909;">
-    <div class="product-media">
-      <img src="Images/men10.jpeg" alt="Men's overcoat" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Mahroon-textured Hald Sleeved Shirt</h3><span class="cat-label">Men</span></div>
-      <span class="product-price">$560</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="men" style="--c1:#B37868; --c2:#4D0909;">
-    <div class="product-media">
-      <img src="Images/men11.jpeg" alt="Men's overcoat" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Acid-Wash Black T-Shirt</h3><span class="cat-label">Men</span></div>
-      <span class="product-price">$560</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="men" style="--c1:#B37868; --c2:#4D0909;">
-    <div class="product-media">
-      <img src="Images/men12.jpeg" alt="Men's overcoat" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Knitted Polo Navy Blue T-Shirt</h3><span class="cat-label">Men</span></div>
-      <span class="product-price">$560</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <!-- BAGS -->
-  <div class="product-card" data-cat="bags" style="--c1:#E4CFC2; --c2:#4D0909;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/bag1.png" alt="Crystal bead top-handle bag" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Crystal Bead Top-Handle Bag</h3><span class="cat-label">Bags</span></div>
-      <span class="product-price">$395</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="bags" style="--c1:#F2E3D8; --c2:#C9998C;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/bag2.png" alt="Tapestry chain shoulder bag" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Tapestry Chain Shoulder Bag</h3><span class="cat-label">Bags</span></div>
-      <span class="product-price">$550</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="bags" style="--c1:#C9998C; --c2:#320606;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/bag3.png" alt="Suede shearling hobo bag" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Suede Shearling Hobo</h3><span class="cat-label">Bags</span></div>
-      <span class="product-price">$475</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="bags" style="--c1:#F7ECE4; --c2:#B37868;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/bag4.png" alt="Floral saddle bag" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Floral Saddle Bag</h3><span class="cat-label">Bags</span></div>
-      <span class="product-price">$625</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="bags" style="--c1:#E4CFC2; --c2:#C9998C;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/bag5.png" alt="Floral sequin shoulder bag" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Floral Sequin Shoulder Bag</h3><span class="cat-label">Bags</span></div>
-      <span class="product-price">$410</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="bags" style="--c1:#320606; --c2:#320606;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/bag6.png" alt="Tweed classic flap bag" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Tweed Classic Flap</h3><span class="cat-label">Bags</span></div>
-      <span class="product-price">$790</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="bags" style="--c1:#F7ECE4; --c2:#B37868;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/bag7.png" alt="Sunset Woven Shoulder Bag" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Sunset Woven Shoulder Bag</h3><span class="cat-label">Bags</span></div>
-      <span class="product-price">$610</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="bags" style="--c1:#E4CFC2; --c2:#4D0909;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/bag8.png" alt="Striped crochet tote" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Striped Crochet Tote</h3><span class="cat-label">Bags</span></div>
-      <span class="product-price">$340</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <!-- DRESSES -->
-  <div class="product-card" data-cat="dresses" style="--c1:#E4CFC2; --c2:#4D0909;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/dress1.png" alt="Satin lace-trim slip dress" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Satin Lace-Trim Slip Dress</h3><span class="cat-label">Dresses</span></div>
-      <span class="product-price">$340</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="dresses" style="--c1:#320606; --c2:#320606;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/dress2.png" alt="Tweed halter peplum dress" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Tweed Halter Peplum Dress</h3><span class="cat-label">Dresses</span></div>
-      <span class="product-price">$455</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="dresses" style="--c1:#F7ECE4; --c2:#C9998C;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/dress3.png" alt="Ombre sequin mini dress" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Ombré Sequin Mini Dress</h3><span class="cat-label">Dresses</span></div>
-      <span class="product-price">$520</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="dresses" style="--c1:#F2E3D8; --c2:#B37868;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/dress4.png" alt="One-shoulder satin gown" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>One-Shoulder Satin Gown</h3><span class="cat-label">Dresses</span></div>
-      <span class="product-price">$780</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="dresses" style="--c1:#B37868; --c2:#320606;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/dress5.png" alt="Plunge sequin halter dress" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Plunge Sequin Halter Dress</h3><span class="cat-label">Dresses</span></div>
-      <span class="product-price">$410</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="dresses" style="--c1:#E4CFC2; --c2:#4D0909;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/dress6.png" alt="Polka dot halter mini dress" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Polka Dot Halter Mini Dress</h3><span class="cat-label">Dresses</span></div>
-      <span class="product-price">$295</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-   <div class="product-card" data-cat="dresses" style="--c1:#E4CFC2; --c2:#4D0909;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/dress7.png" alt="Ivory Bow Tweed Mini Dress" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Ivory Bow Tweed Mini Dress</h3><span class="cat-label">Dresses</span></div>
-      <span class="product-price">$800</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-  <!-- FOOTWEAR -->
-  <div class="product-card" data-cat="footwear" style="--c1:#4E8E86; --c2:#4D0909;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/shoe1.png" alt="Turquoise floral strappy sandal" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Bloom Strap Sandal</h3><span class="cat-label">Footwear</span></div>
-      <span class="product-price">$890</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="footwear" style="--c1:#E8C948; --c2:#C9337A;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/shoe2.png" alt="Ombre crystal pointed pump" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Ombré Crystal Pump</h3><span class="cat-label">Footwear</span></div>
-      <span class="product-price">$1,450</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="footwear" style="--c1:#E8C9DD; --c2:#8A6E96;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/shoe3.png" alt="Lilac beaded fringe sandal" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Lilac Fringe Sandal</h3><span class="cat-label">Footwear</span></div>
-      <span class="product-price">$980</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="footwear" style="--c1:#1F2E4A; --c2:#C9998C;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/shoe4.png" alt="Denim monogram ankle-strap sandal" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Denim Monogram Sandal</h3><span class="cat-label">Footwear</span></div>
-      <span class="product-price">$1,290</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="footwear" style="--c1:#3B2417; --c2:#4D0909;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/shoe5.png" alt="Slouch knee-high leather boot" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Slouch Knee-High Boot</h3><span class="cat-label">Footwear</span></div>
-      <span class="product-price">$760</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="footwear" style="--c1:#F2D97B; --c2:#C9998C;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/shoe6.png" alt="Butter yellow slide sandal" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Butter Yellow Slide</h3><span class="cat-label">Footwear</span></div>
-      <span class="product-price">$650</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="footwear" style="--c1:#5A1414; --c2:#C9998C;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/shoe7.png" alt="Burgundy bow slingback pump" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Bow Slingback Pump</h3><span class="cat-label">Footwear</span></div>
-      <span class="product-price">$890</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="footwear" style="--c1:#1E4A3A; --c2:#4D0909;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/shoe8.png" alt="Emerald green retro sneaker" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Emerald Retro Sneaker</h3><span class="cat-label">Footwear</span></div>
-      <span class="product-price">$120</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="footwear" style="--c1:#E58BA6; --c2:#8A1F3D;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/shoe9.png" alt="Pink toile print slide sandal" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Toile Print Slide</h3><span class="cat-label">Footwear</span></div>
-      <span class="product-price">$650</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
-  <div class="product-card" data-cat="footwear" style="--c1:#B6D98A; --c2:#4D0909;">
-    <div class="product-media">
-      <img class="fit-contain" src="Images/shoe10.png" alt="Pistachio crystal mule" onerror="this.style.display='none'">
-    </div>
-    <div class="product-info">
-      <div><h3>Pistachio Crystal Mule</h3><span class="cat-label">Footwear</span></div>
-      <span class="product-price">$980</span>
-    </div>
-    <div class="card-actions">
-      <button type="button" class="add-cart-btn">Add to Cart</button>
-    </div>
-  </div>
-
+  <!-- Product cards are built by js/shop.js from js/products.js -->
 </div>
 
 <p class="empty-note" id="emptyNote">No pieces in this category yet — check back soon.</p>
@@ -826,7 +341,14 @@
     <span>New York — Paris</span>
   </div>
 </footer>
+
+<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/wishlist.js"></script>
 <script src="js/main.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/shop.js"></script>
+
+<script src="js/theme.js"></script> <!-- ADDED: dark mode -->
 </body>
 </html>
